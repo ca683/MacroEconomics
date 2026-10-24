@@ -1,1 +1,1 @@
-# MacroEconomics
+Julia programming for Macroeconomics
