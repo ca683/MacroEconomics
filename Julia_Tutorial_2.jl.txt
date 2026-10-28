@@ -1,0 +1,194 @@
+# BEEM138 Macro Theory I
+# Julia Tutorial 2: Plots and for loops
+
+# Some useful commands:
+
+# Commenting a whole section: 'Command-/'
+# InterrKpt Julia: 'Control-c'
+# clearconsole() # Clear REPL
+# Undo - control-z
+# ? cos  #REPL command to find
+# exit()  # to exit Julia
+# pwd()   # See present working directory
+# cd(" ") # Set working directory manually to the stuff in between ""
+# Notice progress bar at the bottom left
+# @time helps you time each command
+
+# Calling all packages at beginning is good practice
+using Plots # Notice first time takes long (20 secs approx)
+
+# Let's create some data to plot
+x = 1:10
+y = x.^3
+y1 = x.^2
+
+# One way of plotting with labels
+plot(x, y, label="x^3", linewidth = 3, legend = :topleft) # To create a LaTeX string, we have to write L before the string and put the LaTeX code inside $
+plot!(x, y1, label="x^2", linewidth = 3)
+xlabel!("Number of chocolate bars")
+ylabel!("Weight")
+title!("Obesity Figure 1")
+
+# A second way of plotting
+plot(x, [y, y1],
+   label = ["x^3" "x^2"],
+   linewidth = 3,
+   legend = :topleft, # or no legend, legend = false
+   xlabel = "Number of chocolate bars",
+   ylabel = "Weight",
+   title = "Obesity Figure 2")
+
+# A third way of plotting that uses nice LaTeX font. If you haven't done so, download the LaTeXStrings package.
+using LaTeXStrings
+plot(x, [y, y1], label = [L"x^3" L"x^2"],
+   linewidth = 3,
+   legend = :topleft,
+   xlabel = L"\textrm{Number\ of\ chocolate\ bars}",
+   ylabel = L"\textrm{Weight}",
+   title = L"\textrm{Obesity\ Figure\ 3\ (using\ nice\ LaTeX\ font)}")
+
+# Saving a figure to your project folder
+savefig("figure1")
+
+# Another useful button: "Forget All Plots" button
+
+# For Loops
+# Example: Take for example depreciation, we could just type out the sequence of calculations above by hand,
+# one after the other.
+          
+
+δ = 0.143;  # Rate of depreciation (the greek letter δ is a Unicode character. You get it by typing \delta and clicking the TAB button)
+m = 4;  # Number of rows
+n = 1;  # Number of columns
+K = zeros(m,n); # Prepopulate a matrix where we will store our results
+K[1] = 0.5;
+K[2] = (1-δ)*K[1];
+K[3] = (1-δ)*K[2];
+K[4] = (1-δ)*K[3];
+
+# The for loop provides a much more efficient way of doing this calculation:
+δ = 0.143;  # Rate of depreciation
+m = 4;  # Number of rows
+n = 1;  # Number of columns
+K = zeros(m,n); # Prepopulate a matrix where we will store our results
+K[1] = 0.5;
+for k = 2:4
+   K[k] = (1-δ)*K[k-1]; # Notice it doesn't work if it is not indented
+end
+
+
+# An equivalent way of writing the loop above
+δ = 0.143;  # Rate of depreciation
+m = 4;  # Number of rows
+n = 1;  # Number of columns
+K = zeros(m,n); # Prepopulate a matrix where we will store our results
+K[1] = 0.5;
+for k=1:3
+   K[k+1] = (1-δ)*K[k];
+end
+
+
+# The increment in a for loop doesn't have to be 1
+for j = 2:2:8
+   println(3*j)
+end
+
+
+# For loops are not restricted to a single operation
+x = 4:8;
+m = 5;  # Number of rows
+n = 1;  # Number of columns
+s = zeros(m,n); # Prepopulate a matrix where we will store our results
+c = zeros(m,n); # Prepopulate a matrix where we will store our results
+f = zeros(m,n); # Prepopulate a matrix where we will store our results
+for k=1:m
+   s[k] = x[k]^2;
+   c[k] = x[k]^3;
+   f[k] = x[k]^4;
+end
+
+# Now a longer For Loop. Notice this would be a pain by hand.
+δ = 0.143;
+t = 0:25;
+m = 26;  # Number of rows
+n = 1;  # Number of columns
+r = zeros(m,n); # Prepopulate a matrix where we will store our results
+r[1] = 1;
+for k = 2:m;
+   r[k] = (1-δ)*r[k-1];
+end
+plot(t,r)
+xlabel!("Time period")
+ylabel!("K(t)/K(0)")
+
+
+# Notice we can nest loops
+δ = 0.143;
+t = 0:25;
+m = 26;  # Number of rows
+n = 5;  # Number of columns
+r = zeros(m,n); # Prepopulate a matrix where we will store our results
+r[1,:] .= 1;
+for k = 2 : m
+   # @show k # @show command allows you to see output in each iteration
+   for j = 2 : n
+      r[k,j] = (1-δ)*r[k-1,j-1]*j
+   end
+end
+plot(t,r)
+
+# Another way to allocate an array and fill it is to use a push! command
+c = []
+for i = 1:5
+   push!(c,2*i)
+end
+
+# This can equivalently be done in one line by using an "array comprehension"
+t = [2*i for i=1:5]
+
+c == t
+
+
+## Exercises:
+
+# Exercise 1
+# Consider the iteration x(k+1) = 1.2x(k)-0.2. Compute the first 10 values of this iteration starting with x[1]=3.
+
+
+# Exercise 2
+# Repeat Exercise 3 with x[1]=0.9. Describe the difference in the behaviour of this iteration for this initial value.
+
+
+# Exercise 3
+# Write a program that adds the numbers 1 through 100
+
+
+# Exercise 4
+# Write a program that adds the even numbers between 1 and 100
+
+
+# Exercise 5
+# Recall that n! is read as “n factorial” and defined as n!=n x (n-1) x ... x 2 x 1.
+# In Julia you can compute this value with factorial(n).
+# Write your own version of this calculation, using a for loop.
+
+
+# Exercise 6
+# Suppose that you have a $20,000 loan at 6 percent annual interest compounded monthly.
+# You can afford to pay $200/month toward this loan. How long will it take until the loan
+# is paid off? To do this calculation, think of the amount remaining on the loan from time
+# k to time k+1 as a combination of interest accrued and payment made, express this as an iteration,
+# and then write code using a for loop to find the amount remaining in the loan after N months.
+# You may need to experiment with the value of N to find the value in which the remaining amount passes through zero (and the loan is paid off).
+# Plot the amount remaining in the loan as a function of N. Label the axes, and label the legend appropriately, and include a title.
+
+
+# Exercise 7
+# Repeat Exercise 6 with a $75 monthly payment. Plot in the same graph as the previous exercise the amount remaining in the loan as a function of N. Save this plot as a pdf.
+
+
+# Exercise 8
+# Simulate and plot the correlated time series
+# x(t+1) = δx(t) + ϵ(t+1) where x(0)=0 and t=0,...,n
+# The sequence of shocks {ϵ(t)} is assumed to be iid and standard normal.
+# Set 𝑛 = 200 and 𝛼 = 0.9.
